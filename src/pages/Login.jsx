@@ -24,13 +24,32 @@ const Login = () => {
         }))
     }
 
+    // Demo users for hosted/offline mode (no backend required)
+    const DEMO_USERS = {
+        admin: { id: 1, username: 'admin', role: 'Admin', full_name: 'Admin User', password: 'admin123' },
+        manager: { id: 2, username: 'manager', role: 'Sales Manager', full_name: 'Sales Manager', password: 'manager123' },
+        akki: { id: 3, username: 'akki', role: 'Sales Manager', full_name: 'Akki Bansode', password: 'akki123' },
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault()
         setError('')
         setLoading(true)
 
+        // Try demo login first (works offline / without backend)
+        const demoUser = Object.values(DEMO_USERS).find(
+            u => u.username === formData.username && u.password === formData.password
+        )
+        if (demoUser) {
+            const { password, ...userData } = demoUser
+            login(userData, 'demo-token-' + userData.username)
+            setLoading(false)
+            if (userData.role === 'Admin') navigate('/admin')
+            else navigate('/manager')
+            return
+        }
+
         try {
-            // Call MCP authenticate_user tool
             const response = await api.post('/api/auth/login', {
                 username: formData.username,
                 password: formData.password
@@ -39,28 +58,20 @@ const Login = () => {
             const { success, user_id, username, role, full_name, token } = response.data
 
             if (success) {
-                // Store user data
-                login(
-                    { id: user_id, username, role, full_name },
-                    token
-                )
-
-                // Navigate based on role
-                if (role === 'Admin') {
-                    navigate('/admin')
-                } else {
-                    navigate('/manager')
-                }
+                login({ id: user_id, username, role, full_name }, token)
+                if (role === 'Admin') navigate('/admin')
+                else navigate('/manager')
             } else {
                 setError('Invalid username or password')
             }
         } catch (err) {
             console.error('Login error:', err)
-            setError(err.response?.data?.message || 'Failed to login. Please try again.')
+            setError('Invalid username or password. Try demo credentials below.')
         } finally {
             setLoading(false)
         }
     }
+
 
     return (
         <div className="login-page">
