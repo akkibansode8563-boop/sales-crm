@@ -8,7 +8,7 @@ import './App.css'
 
 function App() {
     return (
-        <Router>
+        <Router basename="/sales-crm">
             <div className="app">
                 <Routes>
                     <Route path="/login" element={<Login />} />
