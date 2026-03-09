@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Day Entry - Sales Manager CRM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-primary: #0D9488;
+            --color-primary-dark: #0F766E;
+            --color-primary-light: #14B8A6;
+            --color-blue: #1E3A8A;
+            --color-text-dark: #1F2937;
+            --color-text-muted: #6B7280;
+            --color-border: #E5E7EB;
+            --color-background: #F9FAFB;
+            --color-white: #FFFFFF;
+            --color-success: #10B981;
+            --color-warning: #F59E0B;
+            --color-error: #DC2626;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--color-background);
+            color: var(--color-text-dark);
+            min-height: 100vh;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: var(--color-white);
+            padding: 0 2rem;
+            height: 64px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--color-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--color-text-dark);
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+
+
+        .nav-tabs {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .nav-tab {
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            color: var(--color-text-muted);
+            font-weight: 500;
+            font-size: 0.875rem;
+            border-radius: var(--radius-md);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-tab:hover {
+            color: var(--color-primary);
+            background: rgba(13, 148, 136, 0.05);
+        }
+
+        .nav-tab.active {
+            color: var(--color-primary);
+            background: rgba(13, 148, 136, 0.1);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .btn-logout {
+            padding: 0.375rem 0.75rem;
+            background: #DC2626;
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .btn-logout:hover {
+            background: #B91C1C;
+        }
+
+        .date-nav {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            background: var(--color-background);
+            padding: 0.25rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--color-border);
+        }
+
+        .btn-nav {
+            background: transparent;
+            border: none;
+            color: var(--color-text-muted);
+            padding: 0.375rem 0.5rem;
+            cursor: pointer;
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+            transition: background 0.2s;
+        }
+
+        .btn-nav:hover {
+            background: rgba(0, 0, 0, 0.05);
+            color: var(--color-primary);
+        }
+
+        .date-display {
+            padding: 0.375rem 0.75rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        .dark-mode-toggle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        /* ===== MAIN LAYOUT ===== */
+        .main-container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 1.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ===== LEFT PANEL - FORM ===== */
+        .form-panel {
+            background: var(--color-white);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            height: fit-content;
+        }
+
+        .form-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--color-primary);
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            color: var(--color-text-muted);
+            margin-bottom: 0.5rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+        }
+
+        .btn-add {
+            width: 100%;
+            padding: 0.875rem;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .btn-add:hover {
+            background: var(--color-primary-dark);
+        }
+
+        /* Quick Summary */
+        .quick-summary {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: var(--color-background);
+            border-radius: var(--radius-md);
+        }
+
+        .quick-summary h4 {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--color-error);
+            margin-bottom: 0.75rem;
+        }
+
+        .quick-stat {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            font-size: 0.875rem;
+        }
+
+        .quick-stat-value {
+            font-weight: 600;
+            color: var(--color-primary);
+        }
+
+        /* ===== RIGHT PANEL - TABLE ===== */
+        .table-panel {
+            background: var(--color-white);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .table-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .table-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .month-picker {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 0.875rem;
+            cursor: pointer;
+        }
+
+        .btn-export {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            background: var(--color-white);
+            color: var(--color-text-dark);
+        }
+
+        .btn-export:hover {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+        }
+
+        /* Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 0.75rem 1rem;
+            background: var(--color-background);
+            color: var(--color-text-muted);
+            font-weight: 500;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .data-table th.sortable {
+            cursor: pointer;
+        }
+
+        .data-table th.sortable:hover {
+            color: var(--color-primary);
+        }
+
+        .data-table td {
+            padding: 0.875rem 1rem;
+            border-bottom: 1px solid var(--color-border);
+            vertical-align: middle;
+        }
+
+        .data-table tbody tr:hover {
+            background: rgba(13, 148, 136, 0.02);
+        }
+
+        .brand-name {
+            font-weight: 600;
+            color: var(--color-text-dark);
+        }
+
+        .achievement-input {
+            width: 70px;
+            padding: 0.375rem 0.5rem;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-sm);
+            text-align: center;
+            font-size: 0.875rem;
+        }
+
+        .achievement-input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+
+        .shortfall {
+            color: var(--color-error);
+            font-weight: 500;
+        }
+
+        .shortfall.zero {
+            color: var(--color-success);
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.625rem;
+            border-radius: 999px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        .status-badge.exceeded {
+            background: #D1FAE5;
+            color: #059669;
+        }
+
+        .status-badge.pending {
+            background: #FEF3C7;
+            color: #D97706;
+        }
+
+        .status-badge.in-progress {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .progress-mini {
+            width: 40px;
+            height: 4px;
+            background: #E5E7EB;
+            border-radius: 2px;
+            overflow: hidden;
+            display: inline-block;
+            margin-left: 0.5rem;
+            vertical-align: middle;
+        }
+
+        .progress-mini-bar {
+            height: 100%;
+            border-radius: 2px;
+        }
+
+        .progress-mini-bar.green {
+            background: var(--color-success);
+        }
+
+        .progress-mini-bar.orange {
+            background: var(--color-warning);
+        }
+
+        .progress-mini-bar.red {
+            background: var(--color-error);
+        }
+
+        /* Footer */
+        .table-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--color-border);
+        }
+
+        .footer-info {
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+        }
+
+        .footer-info strong {
+            color: var(--color-primary);
+        }
+
+        .btn-save-all {
+            padding: 0.75rem 1.5rem;
+            background: var(--color-blue);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .btn-save-all:hover {
+            background: #152e6e;
+        }
+
+        /* Message */
+        .message {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            padding: 0.875rem 1.25rem;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            box-shadow: var(--shadow-md);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateX(100px);
+            transition: all 0.3s;
+        }
+
+        .message.success {
+            background: #D1FAE5;
+            color: #059669;
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .message.error {
+            background: #FEE2E2;
+            color: #DC2626;
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--color-text-muted);
+        }
+
+        .empty-state-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        /* Delete Button */
+        .btn-delete {
+            background: none;
+            border: none;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            padding: 0.25rem;
+            font-size: 0.9rem;
+            opacity: 0.5;
+            transition: all 0.2s;
+        }
+
+        .btn-delete:hover {
+            color: var(--color-error);
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 0 1rem;
+            }
+
+            .main-container {
+                padding: 1rem;
+            }
+
+            .data-table {
+                font-size: 0.8rem;
+            }
+
+            .data-table td,
+            .data-table th {
+                padding: 0.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="logo-icon">
+                    <img src="DCC Logo Back.png" alt="DCC">
+                </div>
+                <span>Product Day</span>
+            </div>
+            <nav class="nav-tabs">
+                <a href="dashboard-manager.html" class="nav-tab">📊 Daily Log</a>
+                <a href="journey-map.html" class="nav-tab">🗺️ Map</a>
+                <a href="daily-sales-report.html" class="nav-tab">📈 Reports</a>
+                <a href="product-day.html" class="nav-tab active">📦 Product Day</a>
+            </nav>
+        </div>
+        <div class="header-right">
+            <div class="date-nav">
+                <button class="btn-nav" onclick="changeDate(-1)">⟨</button>
+                <button class="btn-nav" onclick="changeDate(-7)">⟨⟨</button>
+                <span class="date-display" id="dateDisplay">Loading...</span>
+                <button class="btn-nav" onclick="changeDate(7)">⟩⟩</button>
+                <button class="btn-nav" onclick="changeDate(1)">⟩</button>
+            </div>
+            <span id="userName" style="font-size: 0.875rem; font-weight: 500;">Loading...</span>
+            <button class="btn-logout" onclick="logout()">🚪 Logout</button>
+        </div>
+    </div>
+
+    <!-- Message -->
+    <div id="messageBox" class="message"></div>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Left Panel: Add Product Target -->
+        <div class="form-panel">
+            <div class="form-header">
+                <span>⊕</span> Add Product Target
+            </div>
+            <form id="entryForm">
+                <div class="form-group">
+                    <label>Select Date</label>
+                    <input type="date" id="entryDate">
+                </div>
+                <div class="form-group">
+                    <label>Brand Name</label>
+                    <input type="text" id="brandName" placeholder="e.g., Samsung, LG">
+                </div>
+                <div class="form-group">
+                    <label>Product Name</label>
+                    <input type="text" id="productName" placeholder="e.g., OLED TV">
+                </div>
+                <div class="form-group">
+                    <label>Target Qty</label>
+                    <input type="number" id="targetQty" placeholder="0" min="0">
+                </div>
+                <div class="form-group">
+                    <label>Target Amount (₹)</label>
+                    <input type="number" id="targetAmount" placeholder="0.00" min="0" step="0.01">
+                </div>
+                <button type="submit" class="btn-add">
+                    + Add Entry
+                </button>
+            </form>
+
+            <div class="quick-summary">
+                <h4>Day Quick Summary</h4>
+                <div class="quick-stat">
+                    <span>Entries Today</span>
+                    <span class="quick-stat-value" id="entriesToday">0</span>
+                </div>
+                <div class="quick-stat">
+                    <span>Avg. Achievement</span>
+                    <span class="quick-stat-value" id="avgAchievement">0%</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel: Monthly Summary Table -->
+        <div class="table-panel">
+            <div class="table-header">
+                <div class="table-title">
+                    <span>📊</span> Monthly Product Summary
+                </div>
+                <div class="table-actions">
+                    <input type="month" class="month-picker" id="monthPicker" onchange="loadMonthlyEntries()">
+                    <button class="btn-export" onclick="exportExcel()">📊 EXCEL</button>
+                    <button class="btn-export" onclick="exportPDF()">📄 PDF</button>
+                </div>
+            </div>
+
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th class="sortable">Date ↕</th>
+                        <th class="sortable">Brand ↕</th>
+                        <th class="sortable">Product ↕</th>
+                        <th>Target</th>
+                        <th>Achievement</th>
+                        <th>Shortfall</th>
+                        <th>Ach. %</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="summaryBody">
+                    <tr>
+                        <td colspan="8" class="empty-state">
+                            <div class="empty-state-icon">📦</div>
+                            <p>No entries yet. Add your first product target!</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="table-footer">
+                <div class="footer-info">
+                    Showing <strong id="entryCount">0</strong> products for the selected period
+                </div>
+                <button class="btn-save-all" onclick="saveAll()">
+                    💾 SAVE ALL CHANGES
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3001';
+        let currentUser = null;
+        let currentDate = new Date();
+        let entries = [];
+
+        // Authentication Check
+        window.addEventListener('load', () => {
+            const authData = localStorage.getItem('auth-storage') || sessionStorage.getItem('auth-storage');
+            if (!authData) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                const { state } = JSON.parse(authData);
+                if (!state?.isAuthenticated) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                currentUser = state.user;
+                document.getElementById('userName').textContent = currentUser.username;
+
+                updateDateDisplay();
+                setDefaultDate();
+                setMonthPicker();
+                loadMonthlyEntries();
+            } catch (e) {
+                console.error('Auth error:', e);
+                window.location.href = 'login.html';
+            }
+        });
+
+        function formatDate(date) {
+            return date.toISOString().split('T')[0];
+        }
+
+        function formatDisplayDate(date) {
+            return date.toLocaleDateString('en-IN', {
+                day: '2-digit',
+                month: 'short',
+                year: 'numeric'
+            });
+        }
+
+        function updateDateDisplay() {
+            document.getElementById('dateDisplay').textContent = formatDisplayDate(currentDate);
+        }
+
+        function setDefaultDate() {
+            document.getElementById('entryDate').value = formatDate(currentDate);
+        }
+
+        function setMonthPicker() {
+            const year = currentDate.getFullYear();
+            const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+            document.getElementById('monthPicker').value = `${year}-${month}`;
+        }
+
+        function changeDate(days) {
+            currentDate.setDate(currentDate.getDate() + days);
+            updateDateDisplay();
+            setDefaultDate();
+            setMonthPicker();
+            loadMonthlyEntries();
+        }
+
+        async function loadMonthlyEntries() {
+            try {
+                const monthPicker = document.getElementById('monthPicker');
+                const monthStr = monthPicker.value;
+
+                if (!monthStr) return;
+
+                const response = await fetch(`${API_URL}/api/product-day/${currentUser.id}/${monthStr}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    entries = data.entries;
+                    renderTable();
+                    updateQuickStats();
+                }
+            } catch (error) {
+                console.error('Error loading entries:', error);
+            }
+        }
+
+        function updateQuickStats() {
+            const today = formatDate(currentDate);
+            const todayEntries = entries.filter(e => e.date === today);
+            document.getElementById('entriesToday').textContent = todayEntries.length;
+
+            let totalPercentage = 0;
+            let count = 0;
+            entries.forEach(e => {
+                const target = e.target_qty > 0 ? e.target_qty : e.target_amount;
+                const achieved = e.target_qty > 0 ? e.achieved_qty : e.achieved_amount;
+                if (target > 0) {
+                    totalPercentage += (achieved / target) * 100;
+                    count++;
+                }
+            });
+            const avg = count > 0 ? (totalPercentage / count).toFixed(0) : 0;
+            document.getElementById('avgAchievement').textContent = avg + '%';
+            document.getElementById('entryCount').textContent = entries.length;
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('summaryBody');
+
+            if (entries.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="empty-state">
+                            <div class="empty-state-icon">📦</div>
+                            <p>No entries yet. Add your first product target!</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            let html = '';
+            entries.forEach(entry => {
+                const target = entry.target_qty > 0 ? entry.target_qty : entry.target_amount;
+                const targetLabel = entry.target_qty > 0 ? `${entry.target_qty} qty` : `₹${entry.target_amount?.toLocaleString()}`;
+                const achieved = entry.target_qty > 0 ? entry.achieved_qty : entry.achieved_amount;
+                const shortfall = Math.max(0, target - achieved);
+                const percentage = target > 0 ? ((achieved / target) * 100).toFixed(0) : 0;
+
+                let statusClass = 'pending';
+                let statusText = 'PENDING';
+                let progressColor = 'orange';
+                if (percentage >= 100) {
+                    statusClass = 'exceeded';
+                    statusText = 'EXCEEDED';
+                    progressColor = 'green';
+                } else if (percentage >= 50) {
+                    statusClass = 'in-progress';
+                    statusText = 'IN PROGRESS';
+                    progressColor = 'orange';
+                } else if (percentage > 0) {
+                    statusClass = 'pending';
+                    statusText = 'PENDING';
+                    progressColor = 'red';
+                }
+
+                const shortfallDisplay = entry.target_qty > 0 ? `${shortfall} qty` : `₹${shortfall?.toLocaleString()}`;
+
+                html += `
+                    <tr data-id="${entry.id}">
+                        <td>${formatDisplayDate(new Date(entry.date))}</td>
+                        <td><span class="brand-name">${entry.brand || '-'}</span></td>
+                        <td>${entry.product_name || '-'}</td>
+                        <td>${targetLabel}</td>
+                        <td>
+                            <input type="number" class="achievement-input" 
+                                   id="ach_${entry.id}" 
+                                   value="${achieved}" 
+                                   min="0"
+                                   onchange="updateRow(${entry.id})">
+                            ${entry.target_qty > 0 ? 'QTY' : '₹'}
+                        </td>
+                        <td class="shortfall ${shortfall === 0 ? 'zero' : ''}">
+                            ${shortfall === 0 ? '✅ 0' : shortfallDisplay}
+                        </td>
+                        <td>
+                            <span class="status-badge ${statusClass}">${statusText}</span>
+                            <span class="progress-mini">
+                                <span class="progress-mini-bar ${progressColor}" style="width: ${Math.min(percentage, 100)}%"></span>
+                            </span>
+                            <span style="font-size: 0.75rem; color: #6B7280; margin-left: 0.25rem;">${percentage}%</span>
+                        </td>
+                        <td>
+                            <button class="btn-delete" onclick="deleteEntry(${entry.id})" title="Delete">🗑️</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        function updateRow(entryId) {
+            const entry = entries.find(e => e.id === entryId);
+            if (!entry) return;
+
+            const achieved = parseFloat(document.getElementById(`ach_${entryId}`).value) || 0;
+
+            if (entry.target_qty > 0) {
+                entry.achieved_qty = achieved;
+            } else {
+                entry.achieved_amount = achieved;
+            }
+
+            renderTable();
+            updateQuickStats();
+        }
+
+        document.getElementById('entryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const entryDate = document.getElementById('entryDate').value || formatDate(currentDate);
+            const brandName = document.getElementById('brandName').value.trim();
+            const productName = document.getElementById('productName').value.trim();
+            const targetQty = parseInt(document.getElementById('targetQty').value) || 0;
+            const targetAmount = parseFloat(document.getElementById('targetAmount').value) || 0;
+
+            if (!brandName && !productName) {
+                showMessage('Please enter at least brand or product name', 'error');
+                return;
+            }
+
+            if (targetQty === 0 && targetAmount === 0) {
+                showMessage('Please enter either target qty or amount', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/api/product-day`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        manager_id: currentUser.id,
+                        date: entryDate,
+                        brand: brandName,
+                        product_name: productName,
+                        target_qty: targetQty,
+                        target_amount: targetAmount
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    showMessage('Entry added successfully!', 'success');
+                    document.getElementById('entryForm').reset();
+                    setDefaultDate();
+                    loadMonthlyEntries();
+                } else {
+                    showMessage('Failed to add entry', 'error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('Failed to add entry', 'error');
+            }
+        });
+
+        async function saveAll() {
+            try {
+                for (const entry of entries) {
+                    const achieved = parseFloat(document.getElementById(`ach_${entry.id}`).value) || 0;
+
+                    await fetch(`${API_URL}/api/product-day/${entry.id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            achieved_qty: entry.target_qty > 0 ? achieved : entry.achieved_qty,
+                            achieved_amount: entry.target_amount > 0 ? achieved : entry.achieved_amount
+                        })
+                    });
+                }
+                showMessage('All changes saved!', 'success');
+                loadMonthlyEntries();
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('Failed to save', 'error');
+            }
+        }
+
+        async function deleteEntry(entryId) {
+            if (!confirm('Delete this entry?')) return;
+
+            try {
+                const response = await fetch(`${API_URL}/api/product-day/${entryId}`, {
+                    method: 'DELETE'
+                });
+                const data = await response.json();
+                if (data.success) {
+                    showMessage('Entry deleted', 'success');
+                    loadMonthlyEntries();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('Failed to delete', 'error');
+            }
+        }
+
+        function showMessage(text, type) {
+            const box = document.getElementById('messageBox');
+            box.textContent = text;
+            box.className = `message ${type}`;
+            setTimeout(() => {
+                box.className = 'message';
+            }, 3000);
+        }
+
+        function exportExcel() {
+            alert('Excel export coming soon!');
+        }
+
+        function exportPDF() {
+            alert('PDF export coming soon!');
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('auth-storage');
+                sessionStorage.removeItem('auth-storage');
+                window.location.href = 'login.html';
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Sales Report - Sales Manager CRM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-primary: #0D9488;
+            --color-primary-dark: #0F766E;
+            --color-blue: #1E3A8A;
+            --color-text-dark: #1F2937;
+            --color-text-muted: #6B7280;
+            --color-border: #E5E7EB;
+            --color-background: #F9FAFB;
+            --color-white: #FFFFFF;
+            --color-success: #10B981;
+            --color-warning: #F59E0B;
+            --color-error: #DC2626;
+            --color-purple: #7C3AED;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--color-background);
+            color: var(--color-text-dark);
+            min-height: 100vh;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: var(--color-white);
+            padding: 0 2rem;
+            height: 64px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--color-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--color-text-dark);
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .nav-tab {
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            color: var(--color-text-muted);
+            font-weight: 500;
+            font-size: 0.875rem;
+            border-radius: var(--radius-md);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-tab:hover {
+            color: var(--color-primary);
+            background: rgba(13, 148, 136, 0.05);
+        }
+
+        .nav-tab.active {
+            color: var(--color-primary);
+            background: rgba(13, 148, 136, 0.1);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+        }
+
+        .btn-logout {
+            padding: 0.5rem 1rem;
+            background: var(--color-error);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .btn-logout:hover {
+            background: #B91C1C;
+        }
+
+        /* ===== CONTAINER ===== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem;
+        }
+
+        /* ===== PAGE HEADER ===== */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+
+        .page-title h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-text-dark);
+        }
+
+        .page-title p {
+            color: var(--color-text-muted);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .page-meta {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .meta-box {
+            padding: 0.75rem 1rem;
+            background: var(--color-white);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            text-align: center;
+        }
+
+        .meta-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--color-text-muted);
+            margin-bottom: 0.25rem;
+        }
+
+        .meta-value {
+            font-weight: 600;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        /* ===== STATS CARDS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--color-white);
+            padding: 1.25rem 1.5rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .stat-card.highlight {
+            background: linear-gradient(135deg, #14B8A6 0%, #0D9488 100%);
+            color: white;
+        }
+
+        .stat-content h3 {
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-card.highlight h3 {
+            opacity: 0.9;
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+        }
+
+        .stat-trend {
+            font-size: 0.75rem;
+            color: var(--color-success);
+        }
+
+        .stat-card.highlight .stat-trend {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .stat-subtitle {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+        }
+
+        .stat-card.highlight .stat-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .stat-chart {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 4px solid #E5E7EB;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.8rem;
+            background: conic-gradient(var(--color-primary) var(--percent), #E5E7EB 0);
+        }
+
+        .stat-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 0.25rem 0.5rem;
+            border-radius: 999px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        /* ===== MAIN CARD ===== */
+        .main-card {
+            background: var(--color-white);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1.5rem;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--color-text-dark);
+            font-weight: 600;
+        }
+
+        .section-icon {
+            font-size: 1rem;
+        }
+
+        /* ===== FORM STYLES ===== */
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .form-section-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-section-title .icon {
+            width: 20px;
+            height: 20px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+
+        .form-section-title .icon.orange {
+            background: #FFEDD5;
+            color: #EA580C;
+        }
+
+        .form-section-title .icon.green {
+            background: #D1FAE5;
+            color: #059669;
+        }
+
+        .form-section-title .icon.blue {
+            background: #DBEAFE;
+            color: #2563EB;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            color: var(--color-text-dark);
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .form-group label .required {
+            color: var(--color-error);
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-group .hint {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            margin-top: 0.5rem;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 1rem;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            background: var(--color-primary-dark);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .submit-hint {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+            margin-top: 0.75rem;
+        }
+
+        .dark-mode-toggle {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--color-white);
+            border: 1px solid var(--color-border);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        /* ===== MESSAGES ===== */
+        .message {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            box-shadow: var(--shadow-md);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateX(100px);
+            transition: all 0.3s;
+        }
+
+        .message.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .message.success {
+            background: #D1FAE5;
+            color: #059669;
+        }
+
+        .message.error {
+            background: #FEE2E2;
+            color: #DC2626;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--color-text-muted);
+            font-size: 0.8rem;
+        }
+
+        .footer a {
+            color: var(--color-primary);
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 0 1rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-tabs {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="logo-icon">
+                    <img src="DCC Logo Back.png" alt="DCC">
+                </div>
+                <span>Sales Manager CRM</span>
+            </div>
+            <nav class="nav-tabs">
+                <a href="dashboard-manager.html" class="nav-tab">📊 Visit Journey</a>
+                <a href="journey-map.html" class="nav-tab">🗺️ Journey Map</a>
+                <a href="daily-sales-report.html" class="nav-tab active">📈 Daily Sales Report</a>
+                <a href="product-day.html" class="nav-tab">📦 Product Day</a>
+            </nav>
+        </div>
+        <div class="header-right">
+            <div class="user-info">
+                <div class="user-name">Welcome back,</div>
+                <div class="user-role" id="userName">john_doe</div>
+            </div>
+            <button class="btn-logout" onclick="logout()">🚪 Logout</button>
+        </div>
+    </div>
+
+    <!-- Messages -->
+    <div id="successMessage" class="message success"></div>
+    <div id="errorMessage" class="message error"></div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="page-title">
+                <h1>Daily Sales Report Analytics</h1>
+                <p>Detailed performance breakdown for the current cycle.</p>
+            </div>
+            <div class="page-meta">
+                <div class="meta-box">
+                    <div class="meta-label">Reporting Date</div>
+                    <div class="meta-value">
+                        📅 <span id="reportDateDisplay">06 Feb 2026</span>
+                    </div>
+                </div>
+                <div class="meta-box">
+                    <div class="meta-label">Manager</div>
+                    <div class="meta-value">
+                        👤 <span id="managerDisplay">John Doe</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-content">
+                    <h3>Sales Achievement</h3>
+                    <div class="stat-value">
+                        ₹<span id="salesAchDisplay">0</span>
+                        <span class="stat-trend" id="salesTrend">↑0%</span>
+                    </div>
+                    <div class="stat-subtitle">Target: ₹<span id="salesTargetDisplay">0</span></div>
+                </div>
+                <div class="stat-chart" style="--percent: 0%">
+                    <span id="salesPercentChart">0%</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-content">
+                    <h3>Net Profit</h3>
+                    <div class="stat-value">
+                        ₹<span id="profitAchDisplay">0</span>
+                        <span class="stat-trend" id="profitTrend">↑0%</span>
+                    </div>
+                    <div class="stat-subtitle">Target: ₹<span id="profitTargetDisplay">0</span></div>
+                </div>
+                <div class="stat-chart" style="--percent: 0%">
+                    <span id="profitPercentChart">0%</span>
+                </div>
+            </div>
+            <div class="stat-card highlight">
+                <div class="stat-content">
+                    <h3>Daily Profit Percentage</h3>
+                    <div class="stat-value" id="overallProfitPercent">0.00%</div>
+                    <span class="stat-badge">OVERALL MARGIN</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Entry Form Card -->
+        <div class="main-card">
+            <div class="section-header">
+                <span class="section-icon">⚡</span>
+                Entry & Review
+            </div>
+
+            <form id="salesReportForm">
+                <!-- Sales Information -->
+                <div class="form-section">
+                    <div class="form-section-title">
+                        <span class="icon orange">📊</span>
+                        Sales Information
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Sales Target (₹) <span class="required">*</span></label>
+                            <input type="number" id="salesTarget" placeholder="100000" required min="0" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label>Sales Achievement (₹) <span class="required">*</span></label>
+                            <input type="number" id="salesAchievement" placeholder="150000" required min="0"
+                                step="0.01">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profit Information -->
+                <div class="form-section">
+                    <div class="form-section-title">
+                        <span class="icon green">💰</span>
+                        Profit Information
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Profit Target (₹) <span class="required">*</span></label>
+                            <input type="number" id="profitTarget" placeholder="1000" required min="0" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label>Profit Achievement (₹) <span class="required">*</span></label>
+                            <input type="number" id="profitAchievement" placeholder="1500" required min="0" step="0.01">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notes -->
+                <div class="form-section">
+                    <div class="form-section-title">
+                        <span class="icon blue">📝</span>
+                        Notes & Remarks
+                    </div>
+                    <div class="form-group">
+                        <label>Daily Summary</label>
+                        <textarea id="dailySummary"
+                            placeholder="Enter any additional details or context for today's performance..."></textarea>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit" id="submitBtn">
+                    🚀 Submit Daily Sales Report
+                </button>
+                <p class="submit-hint">Once submitted, this report will be reviewed by the regional supervisor.</p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        © 2026 Sales Manager CRM. All rights reserved.<br>
+        <a href="#">Privacy Policy</a> • <a href="#">Help Center</a>
+    </div>
+
+    <!-- Dark Mode Toggle -->
+    <button class="dark-mode-toggle">🌙</button>
+
+    <script>
+        const API_URL = 'http://localhost:3001';
+        let currentUser = null;
+        const today = new Date().toISOString().split('T')[0];
+
+        // Check authentication
+        window.addEventListener('load', () => {
+            const authData = localStorage.getItem('auth-storage') || sessionStorage.getItem('auth-storage');
+
+            if (!authData) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                const { state } = JSON.parse(authData);
+
+                if (!state.isAuthenticated) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                currentUser = state.user;
+                document.getElementById('userName').textContent = currentUser.username;
+                document.getElementById('managerDisplay').textContent = currentUser.full_name || currentUser.username;
+
+                // Set date display
+                const displayDate = new Date().toLocaleDateString('en-IN', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                });
+                document.getElementById('reportDateDisplay').textContent = displayDate;
+
+                // Redirect admins
+                if (currentUser.role === 'Admin') {
+                    window.location.href = 'dashboard-admin.html';
+                }
+
+                loadTodayReport();
+            } catch (e) {
+                console.error('Auth error:', e);
+                window.location.href = 'login.html';
+            }
+        });
+
+        // Real-time calculations
+        const salesTargetInput = document.getElementById('salesTarget');
+        const salesAchievementInput = document.getElementById('salesAchievement');
+        const profitTargetInput = document.getElementById('profitTarget');
+        const profitAchievementInput = document.getElementById('profitAchievement');
+
+        function updateStats() {
+            const salesTarget = parseFloat(salesTargetInput.value) || 0;
+            const salesAchievement = parseFloat(salesAchievementInput.value) || 0;
+            const profitTarget = parseFloat(profitTargetInput.value) || 0;
+            const profitAchievement = parseFloat(profitAchievementInput.value) || 0;
+
+            // Sales display
+            document.getElementById('salesTargetDisplay').textContent = salesTarget.toLocaleString();
+            document.getElementById('salesAchDisplay').textContent = (salesAchievement / 100000).toFixed(2) + 'L';
+            const salesPercent = salesTarget > 0 ? ((salesAchievement / salesTarget) * 100).toFixed(0) : 0;
+            document.getElementById('salesPercentChart').textContent = salesPercent + '%';
+            document.getElementById('salesTrend').textContent = '↑' + salesPercent + '%';
+
+            // Profit display
+            document.getElementById('profitTargetDisplay').textContent = '₹' + profitTarget.toLocaleString();
+            document.getElementById('profitAchDisplay').textContent = profitAchievement.toLocaleString();
+            const profitTargetPercent = profitTarget > 0 ? ((profitAchievement / profitTarget) * 100).toFixed(0) : 0;
+            document.getElementById('profitPercentChart').textContent = profitTargetPercent + '%';
+            document.getElementById('profitTrend').textContent = '↑' + profitTargetPercent + '%';
+
+            // Overall profit percentage
+            if (salesAchievement > 0) {
+                const overallPercent = ((profitAchievement / salesAchievement) * 100).toFixed(2);
+                document.getElementById('overallProfitPercent').textContent = overallPercent + '%';
+            } else {
+                document.getElementById('overallProfitPercent').textContent = '0.00%';
+            }
+        }
+
+        salesTargetInput.addEventListener('input', updateStats);
+        salesAchievementInput.addEventListener('input', updateStats);
+        profitTargetInput.addEventListener('input', updateStats);
+        profitAchievementInput.addEventListener('input', updateStats);
+
+        // Load existing report
+        async function loadTodayReport() {
+            try {
+                const response = await fetch(`${API_URL}/api/daily-sales-report/${currentUser.id}/${today}`);
+                const data = await response.json();
+
+                if (data.success && data.report) {
+                    salesTargetInput.value = data.report.sales_target;
+                    salesAchievementInput.value = data.report.sales_achievement;
+                    profitTargetInput.value = data.report.profit_target;
+                    profitAchievementInput.value = data.report.profit_achievement;
+                    updateStats();
+                }
+            } catch (error) {
+                console.error('Error loading today report:', error);
+            }
+        }
+
+        // Submit form
+        document.getElementById('salesReportForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '⏳ Submitting...';
+
+            const reportData = {
+                manager_id: currentUser.id,
+                date: today,
+                sales_target: parseFloat(salesTargetInput.value),
+                sales_achievement: parseFloat(salesAchievementInput.value),
+                profit_target: parseFloat(profitTargetInput.value),
+                profit_achievement: parseFloat(profitAchievementInput.value)
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/api/daily-sales-report`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(reportData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('success', '✅ ' + data.message);
+                    updateStats();
+                } else {
+                    showMessage('error', '❌ Failed to submit report');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('error', '❌ Error submitting report. Please try again.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '🚀 Submit Daily Sales Report';
+            }
+        });
+
+        function showMessage(type, message) {
+            const msgElement = document.getElementById(type === 'success' ? 'successMessage' : 'errorMessage');
+            msgElement.textContent = message;
+            msgElement.classList.add('show');
+
+            setTimeout(() => {
+                msgElement.classList.remove('show');
+            }, 5000);
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('auth-storage');
+                sessionStorage.removeItem('auth-storage');
+                window.location.href = 'login.html';
+            }
+        }
+    </script>
+</body>
+
+</html>

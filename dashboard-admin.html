@@ -1,0 +1,1357 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Sales CRM</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        :root {
+            --color-primary: #1E3A8A;
+            --color-accent: #0D9488;
+            --color-success: #059669;
+            --color-warning: #D97706;
+            --color-error: #DC2626;
+            --color-text: #111827;
+            --color-text-muted: #6B7280;
+            --color-border: #E5E7EB;
+            --color-bg: #F9FAFB;
+            --color-white: #FFFFFF;
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--color-bg);
+            color: var(--color-text);
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: var(--color-white);
+            padding: 0 2rem;
+            height: 64px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--color-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .header h1 {
+            font-family: 'Outfit', sans-serif;
+            color: var(--color-primary);
+            font-size: 1.5rem;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .admin-badge {
+            padding: 0.25rem 0.75rem;
+            background: var(--color-warning);
+            color: white;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .btn-logout {
+            padding: 0.5rem 1rem;
+            background: var(--color-error);
+            color: white;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .btn-logout:hover {
+            background: #B91C1C;
+        }
+
+        /* Tab Navigation */
+        .tab-nav {
+            background: var(--color-white);
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            padding: 0 2rem;
+        }
+
+        .tab-btn {
+            padding: 1rem 1.5rem;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--color-text-muted);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tab-btn:hover {
+            color: var(--color-primary);
+        }
+
+        .tab-btn.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+        }
+
+        .tab-icon {
+            font-size: 1.25rem;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--color-white);
+            padding: 1.25rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            border-left: 4px solid var(--color-accent);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--color-text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--color-primary);
+        }
+
+        /* Cards */
+        .card {
+            background: var(--color-white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--color-primary);
+        }
+
+        /* Table */
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        th {
+            background: var(--color-bg);
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--color-text-muted);
+        }
+
+        tr:hover {
+            background: #F3F4F6;
+        }
+
+        /* Badges */
+        .badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .badge-warning {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .badge-primary {
+            background: #DBEAFE;
+            color: #1E40AF;
+        }
+
+        .badge-muted {
+            background: #E5E7EB;
+            color: #374151;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1E40AF;
+        }
+
+        .btn-accent {
+            background: var(--color-accent);
+            color: white;
+        }
+
+        .btn-accent:hover {
+            background: #0F766E;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--color-border);
+            color: var(--color-text);
+        }
+
+        .btn-outline:hover {
+            background: var(--color-bg);
+        }
+
+        .btn-sm {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.8rem;
+        }
+
+        .btn-danger {
+            background: var(--color-error);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #B91C1C;
+        }
+
+        /* Forms */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.625rem 0.75rem;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--color-accent);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--color-white);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--color-text-muted);
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+        }
+
+        /* Live Map */
+        #liveMap {
+            height: 400px;
+            border-radius: var(--radius-lg);
+            margin-bottom: 1.5rem;
+        }
+
+        /* Manager Cards Grid */
+        .manager-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+
+        .manager-card {
+            background: var(--color-white);
+            border-radius: var(--radius-lg);
+            padding: 1rem;
+            box-shadow: var(--shadow-sm);
+            border-left: 4px solid var(--color-accent);
+        }
+
+        .manager-card.active-journey {
+            border-left-color: var(--color-success);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                box-shadow: var(--shadow-sm);
+            }
+
+            50% {
+                box-shadow: 0 0 15px rgba(5, 150, 105, 0.3);
+            }
+        }
+
+        .manager-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .manager-name {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .manager-detail {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Auto-refresh */
+        .refresh-control {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .refresh-control select {
+            padding: 0.375rem 0.75rem;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+        }
+
+        /* Checkbox Group */
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            background: var(--color-bg);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+        }
+
+        .checkbox-item:hover {
+            background: #E5E7EB;
+        }
+
+        .checkbox-item input {
+            width: 1rem;
+            height: 1rem;
+        }
+
+        /* Message Toast */
+        .toast {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+            z-index: 300;
+            opacity: 0;
+            transform: translateX(100px);
+            transition: all 0.3s;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .toast.error {
+            background: #FEE2E2;
+            color: #DC2626;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <div class="logo-icon">
+                <img src="DCC Logo Back.png" alt="DCC Logo">
+            </div>
+            <h1>Admin Dashboard</h1>
+        </div>
+        <div class="header-right">
+            <span class="admin-badge">ADMIN</span>
+            <span id="userName">Administrator</span>
+            <button class="btn-logout" onclick="logout()">🚪 Logout</button>
+        </div>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab('managers')">
+            <span class="tab-icon">👥</span> Managers
+        </button>
+        <button class="tab-btn" onclick="switchTab('targets')">
+            <span class="tab-icon">🎯</span> Targets
+        </button>
+        <button class="tab-btn" onclick="switchTab('monitor')">
+            <span class="tab-icon">📍</span> Live Monitor
+        </button>
+        <button class="tab-btn" onclick="switchTab('productday')">
+            <span class="tab-icon">📦</span> Product Day
+        </button>
+    </div>
+
+    <!-- Toast Message -->
+    <div id="toast" class="toast"></div>
+
+    <div class="container">
+        <!-- Tab 1: Managers -->
+        <div id="tab-managers" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Managers</div>
+                    <div class="stat-value" id="statTotalManagers">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Active Today</div>
+                    <div class="stat-value" id="statActiveToday">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">In Field</div>
+                    <div class="stat-value" id="statInField">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Admins</div>
+                    <div class="stat-value" id="statTotalAdmins">0</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Manager List</h2>
+                    <button class="btn btn-primary" onclick="openAddUserModal()">
+                        ➕ Add Manager
+                    </button>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Territory</th>
+                                <th>Role</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="managersTableBody">
+                            <tr>
+                                <td colspan="7">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Targets -->
+        <div id="tab-targets" class="tab-content">
+            <div class="card">
+                <h2 class="card-title">Bulk Target Assignment</h2>
+                <p style="color: var(--color-text-muted); margin-bottom: 1rem;">
+                    Select managers and assign monthly targets in bulk.
+                </p>
+
+                <form id="bulkTargetForm">
+                    <div class="form-group">
+                        <label>Select Managers</label>
+                        <div class="checkbox-group" id="managerCheckboxes">
+                            Loading managers...
+                        </div>
+                        <button type="button" class="btn btn-sm btn-outline" onclick="selectAllManagers()">
+                            Select All
+                        </button>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Month</label>
+                            <select id="targetMonth">
+                                <option value="1">January</option>
+                                <option value="2">February</option>
+                                <option value="3">March</option>
+                                <option value="4">April</option>
+                                <option value="5">May</option>
+                                <option value="6">June</option>
+                                <option value="7">July</option>
+                                <option value="8">August</option>
+                                <option value="9">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Year</label>
+                            <select id="targetYear"></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Visit Target</label>
+                            <input type="number" id="visitTarget" placeholder="e.g. 50" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Sales Target (₹)</label>
+                            <input type="number" id="salesTarget" placeholder="e.g. 500000" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-accent">
+                        🎯 Assign Targets
+                    </button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Quick Templates</h2>
+                <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                    <button class="btn btn-outline" onclick="applyTemplate('standard')">
+                        Standard (30 visits, ₹3L)
+                    </button>
+                    <button class="btn btn-outline" onclick="applyTemplate('aggressive')">
+                        Aggressive (50 visits, ₹5L)
+                    </button>
+                    <button class="btn btn-outline" onclick="applyTemplate('light')">
+                        Light (20 visits, ₹2L)
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 3: Live Monitor -->
+        <div id="tab-monitor" class="tab-content">
+            <div class="card-header" style="margin-bottom: 1rem;">
+                <h2 class="card-title">Live Manager Tracking</h2>
+                <div class="refresh-control">
+                    <label>Auto-refresh:</label>
+                    <select id="refreshInterval" onchange="setRefreshInterval()">
+                        <option value="0">Off</option>
+                        <option value="5000">5 seconds</option>
+                        <option value="10000" selected>10 seconds</option>
+                        <option value="30000">30 seconds</option>
+                    </select>
+                    <button class="btn btn-sm btn-outline" onclick="refreshLiveData()">
+                        🔄 Refresh Now
+                    </button>
+                </div>
+            </div>
+
+            <div id="liveMap"></div>
+
+            <div class="manager-grid" id="liveManagerGrid">
+                Loading live data...
+            </div>
+        </div>
+
+        <!-- Tab 4: Product Day -->
+        <div id="tab-productday" class="tab-content">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Products</div>
+                    <div class="stat-value" id="statTotalProducts">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Qty Target</div>
+                    <div class="stat-value" id="statTotalQtyTarget">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Qty Achieved</div>
+                    <div class="stat-value" id="statTotalQtyAchieved">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Achievement %</div>
+                    <div class="stat-value" id="statAchievementPct">0%</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Product Day Entries</h2>
+                    <div style="display: flex; gap: 0.75rem; align-items: center;">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <select id="pdManagerFilter" onchange="loadProductDayData()">
+                                <option value="">All Managers</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <input type="date" id="pdDateFilter" onchange="loadProductDayData()">
+                        </div>
+                        <button class="btn btn-outline btn-sm" onclick="clearPdFilters()">
+                            Clear Filters
+                        </button>
+                    </div>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Manager</th>
+                                <th>Date</th>
+                                <th>Product</th>
+                                <th>Target Qty</th>
+                                <th>Achieved Qty</th>
+                                <th>Target Amount</th>
+                                <th>Achieved Amount</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productDayTableBody">
+                            <tr>
+                                <td colspan="9">Loading...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit User Modal -->
+    <div class="modal-overlay" id="userModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Add Manager</h3>
+                <button class="modal-close" onclick="closeUserModal()">&times;</button>
+            </div>
+            <form id="userForm">
+                <input type="hidden" id="userId">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Full Name *</label>
+                        <input type="text" id="fullName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Username *</label>
+                        <input type="text" id="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="email">
+                    </div>
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="tel" id="phone">
+                    </div>
+                    <div class="form-group">
+                        <label>Territory</label>
+                        <input type="text" id="territory" placeholder="e.g. Mumbai West">
+                    </div>
+                    <div class="form-group">
+                        <label>Role</label>
+                        <select id="role">
+                            <option value="Sales Manager">Sales Manager</option>
+                            <option value="Admin">Admin</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label id="passwordLabel">Password *</label>
+                    <input type="password" id="password">
+                    <small style="color: var(--color-text-muted);">Leave blank to keep existing password (edit
+                        mode)</small>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="closeUserModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">Add Manager</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3001';
+        let allManagers = [];
+        let liveMap = null;
+        let markers = {};
+        let refreshTimer = null;
+
+        // Auth check
+        const authData = localStorage.getItem('auth-storage') || sessionStorage.getItem('auth-storage');
+        if (!authData) {
+            window.location.href = 'login.html';
+        } else {
+            try {
+                const { state } = JSON.parse(authData);
+                document.getElementById('userName').textContent = state?.user?.full_name || 'Admin';
+            } catch (e) { }
+        }
+
+        // Tab switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+
+            document.querySelector(`[onclick="switchTab('${tabName}')"]`).classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+
+            if (tabName === 'monitor' && !liveMap) {
+                initLiveMap();
+            }
+            if (tabName === 'monitor') {
+                refreshLiveData();
+            }
+            if (tabName === 'productday') {
+                loadProductDayData();
+            }
+        }
+
+        // Toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Load managers
+        async function loadManagers() {
+            try {
+                const res = await fetch(`${API_URL}/api/users`);
+                const data = await res.json();
+
+                if (data.success) {
+                    allManagers = data.users;
+                    renderManagersTable();
+                    renderManagerCheckboxes();
+                    updateStats();
+                    populatePdManagerFilter();
+                }
+            } catch (err) {
+                console.error('Error loading managers:', err);
+                showToast('Failed to load managers', 'error');
+            }
+        }
+
+        function renderManagersTable() {
+            const tbody = document.getElementById('managersTableBody');
+
+            if (allManagers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--color-text-muted);">No managers found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = allManagers.map(user => `
+                <tr>
+                    <td>${user.id}</td>
+                    <td><strong>${user.full_name}</strong></td>
+                    <td>${user.username}</td>
+                    <td>${user.email || '-'}</td>
+                    <td><span class="badge badge-muted">${user.territory || 'Unassigned'}</span></td>
+                    <td><span class="badge ${user.role === 'Admin' ? 'badge-warning' : 'badge-primary'}">${user.role}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline" onclick="editUser(${user.id})">✏️ Edit</button>
+                        ${user.role !== 'Admin' ? `<button class="btn btn-sm btn-danger" onclick="deleteUser(${user.id}, '${user.full_name}')">🗑️</button>` : ''}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderManagerCheckboxes() {
+            const container = document.getElementById('managerCheckboxes');
+            const managers = allManagers.filter(u => u.role === 'Sales Manager');
+
+            if (managers.length === 0) {
+                container.innerHTML = '<p style="color: var(--color-text-muted);">No managers available</p>';
+                return;
+            }
+
+            container.innerHTML = managers.map(m => `
+                <label class="checkbox-item">
+                    <input type="checkbox" name="manager" value="${m.id}">
+                    ${m.full_name}
+                </label>
+            `).join('');
+        }
+
+        function updateStats() {
+            const managers = allManagers.filter(u => u.role === 'Sales Manager');
+            const admins = allManagers.filter(u => u.role === 'Admin');
+
+            document.getElementById('statTotalManagers').textContent = managers.length;
+            document.getElementById('statTotalAdmins').textContent = admins.length;
+        }
+
+        // User CRUD
+        function openAddUserModal() {
+            document.getElementById('modalTitle').textContent = 'Add Manager';
+            document.getElementById('submitBtn').textContent = 'Add Manager';
+            document.getElementById('userForm').reset();
+            document.getElementById('userId').value = '';
+            document.getElementById('password').required = true;
+            document.getElementById('userModal').classList.add('active');
+        }
+
+        async function editUser(id) {
+            const user = allManagers.find(u => u.id === id);
+            if (!user) return;
+
+            document.getElementById('modalTitle').textContent = 'Edit Manager';
+            document.getElementById('submitBtn').textContent = 'Save Changes';
+            document.getElementById('userId').value = user.id;
+            document.getElementById('fullName').value = user.full_name;
+            document.getElementById('username').value = user.username;
+            document.getElementById('email').value = user.email || '';
+            document.getElementById('phone').value = user.phone || '';
+            document.getElementById('territory').value = user.territory || '';
+            document.getElementById('role').value = user.role;
+            document.getElementById('password').value = '';
+            document.getElementById('password').required = false;
+            document.getElementById('userModal').classList.add('active');
+        }
+
+        function closeUserModal() {
+            document.getElementById('userModal').classList.remove('active');
+        }
+
+        document.getElementById('userForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const userId = document.getElementById('userId').value;
+            const userData = {
+                full_name: document.getElementById('fullName').value,
+                username: document.getElementById('username').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                territory: document.getElementById('territory').value,
+                role: document.getElementById('role').value
+            };
+
+            const password = document.getElementById('password').value;
+            if (password) userData.password = password;
+
+            try {
+                const method = userId ? 'PUT' : 'POST';
+                const url = userId ? `${API_URL}/api/users/${userId}` : `${API_URL}/api/users`;
+
+                const res = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    showToast(userId ? 'Manager updated successfully' : 'Manager added successfully');
+                    closeUserModal();
+                    loadManagers();
+                } else {
+                    showToast(data.message || 'Operation failed', 'error');
+                }
+            } catch (err) {
+                console.error('Error:', err);
+                showToast('Failed to save manager', 'error');
+            }
+        });
+
+        async function deleteUser(id, name) {
+            if (!confirm(`Are you sure you want to delete ${name}?`)) return;
+
+            try {
+                const res = await fetch(`${API_URL}/api/users/${id}`, { method: 'DELETE' });
+                const data = await res.json();
+
+                if (data.success) {
+                    showToast('Manager deleted successfully');
+                    loadManagers();
+                } else {
+                    showToast(data.message || 'Delete failed', 'error');
+                }
+            } catch (err) {
+                showToast('Failed to delete manager', 'error');
+            }
+        }
+
+        // Bulk Targets
+        function selectAllManagers() {
+            const checkboxes = document.querySelectorAll('#managerCheckboxes input[type="checkbox"]');
+            const allChecked = [...checkboxes].every(cb => cb.checked);
+            checkboxes.forEach(cb => cb.checked = !allChecked);
+        }
+
+        function applyTemplate(type) {
+            const templates = {
+                standard: { visits: 30, sales: 300000 },
+                aggressive: { visits: 50, sales: 500000 },
+                light: { visits: 20, sales: 200000 }
+            };
+
+            const t = templates[type];
+            document.getElementById('visitTarget').value = t.visits;
+            document.getElementById('salesTarget').value = t.sales;
+            showToast(`Applied "${type}" template`);
+        }
+
+        // Initialize year dropdown
+        function initYearDropdown() {
+            const select = document.getElementById('targetYear');
+            const currentYear = new Date().getFullYear();
+            for (let y = currentYear; y <= currentYear + 2; y++) {
+                select.innerHTML += `<option value="${y}">${y}</option>`;
+            }
+
+            // Set current month
+            document.getElementById('targetMonth').value = new Date().getMonth() + 1;
+        }
+
+        document.getElementById('bulkTargetForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const checkboxes = document.querySelectorAll('#managerCheckboxes input:checked');
+            const managerIds = [...checkboxes].map(cb => parseInt(cb.value));
+
+            if (managerIds.length === 0) {
+                showToast('Please select at least one manager', 'error');
+                return;
+            }
+
+            const targetData = {
+                manager_ids: managerIds,
+                visit_target: parseInt(document.getElementById('visitTarget').value),
+                sales_target: parseInt(document.getElementById('salesTarget').value),
+                month: parseInt(document.getElementById('targetMonth').value),
+                year: parseInt(document.getElementById('targetYear').value)
+            };
+
+            try {
+                const res = await fetch(`${API_URL}/api/targets/bulk`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(targetData)
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    showToast(`Created ${data.targets.length} targets successfully`);
+                    document.querySelectorAll('#managerCheckboxes input').forEach(cb => cb.checked = false);
+                } else {
+                    showToast(data.message || 'Failed to create targets', 'error');
+                }
+            } catch (err) {
+                showToast('Failed to assign targets', 'error');
+            }
+        });
+
+        // Live Monitor
+        function initLiveMap() {
+            liveMap = L.map('liveMap').setView([19.076, 72.8777], 11); // Mumbai center
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap'
+            }).addTo(liveMap);
+        }
+
+        async function refreshLiveData() {
+            try {
+                const res = await fetch(`${API_URL}/api/live/status`);
+                const data = await res.json();
+
+                if (data.success) {
+                    renderLiveManagerCards(data.managers);
+                    updateLiveMap(data.managers);
+
+                    // Update stats
+                    const activeCount = data.managers.filter(m => m.active_journey).length;
+                    const fieldCount = data.managers.filter(m => m.status === 'Field Visit').length;
+                    document.getElementById('statActiveToday').textContent = activeCount;
+                    document.getElementById('statInField').textContent = fieldCount;
+                }
+            } catch (err) {
+                console.error('Error refreshing live data:', err);
+            }
+        }
+
+        function renderLiveManagerCards(managers) {
+            const grid = document.getElementById('liveManagerGrid');
+
+            if (managers.length === 0) {
+                grid.innerHTML = '<p style="color: var(--color-text-muted);">No managers found</p>';
+                return;
+            }
+
+            grid.innerHTML = managers.map(m => `
+                <div class="manager-card ${m.active_journey ? 'active-journey' : ''}">
+                    <div class="manager-header">
+                        <span class="manager-name">${m.name}</span>
+                        <span class="badge ${m.status === 'Field Visit' ? 'badge-success' : 'badge-primary'}">
+                            ${m.status}
+                        </span>
+                    </div>
+                    <div class="manager-detail">
+                        📍 ${m.territory}
+                    </div>
+                    <div class="manager-detail">
+                        🚗 Visits today: <strong>${m.visits_today}</strong>
+                    </div>
+                    ${m.last_location ? `
+                        <div class="manager-detail">
+                            📌 Last: ${m.last_location.name}
+                        </div>
+                    ` : ''}
+                    ${m.active_journey ? `
+                        <div class="manager-detail" style="color: var(--color-success);">
+                            🟢 Active Journey
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        function updateLiveMap(managers) {
+            if (!liveMap) return;
+
+            // Clear old markers
+            Object.values(markers).forEach(m => liveMap.removeLayer(m));
+            markers = {};
+
+            managers.forEach(m => {
+                if (m.last_location && m.last_location.lat && m.last_location.lng) {
+                    const color = m.active_journey ? '#059669' : '#1E3A8A';
+                    const icon = L.divIcon({
+                        className: 'custom-marker',
+                        html: `<div style="
+                            background: ${color};
+                            color: white;
+                            padding: 4px 8px;
+                            border-radius: 12px;
+                            font-size: 12px;
+                            font-weight: 600;
+                            white-space: nowrap;
+                            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+                        ">${m.name.split(' ')[0]}</div>`,
+                        iconSize: [80, 24],
+                        iconAnchor: [40, 12]
+                    });
+
+                    const marker = L.marker([m.last_location.lat, m.last_location.lng], { icon })
+                        .addTo(liveMap)
+                        .bindPopup(`
+                            <strong>${m.name}</strong><br>
+                            Status: ${m.status}<br>
+                            Visits: ${m.visits_today}<br>
+                            Location: ${m.last_location.name}
+                        `);
+
+                    markers[m.id] = marker;
+                }
+            });
+
+            // Fit bounds if we have markers
+            const markerList = Object.values(markers);
+            if (markerList.length > 0) {
+                const group = L.featureGroup(markerList);
+                liveMap.fitBounds(group.getBounds().pad(0.1));
+            }
+        }
+
+        function setRefreshInterval() {
+            const interval = parseInt(document.getElementById('refreshInterval').value);
+
+            if (refreshTimer) {
+                clearInterval(refreshTimer);
+                refreshTimer = null;
+            }
+
+            if (interval > 0) {
+                refreshTimer = setInterval(refreshLiveData, interval);
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('auth-storage');
+            sessionStorage.removeItem('auth-storage');
+            window.location.href = 'login.html';
+        }
+
+        // ============================================
+        // PRODUCT DAY TAB
+        // ============================================
+        let allProductDayEntries = [];
+
+        async function loadProductDayData() {
+            try {
+                const managerId = document.getElementById('pdManagerFilter').value;
+                const date = document.getElementById('pdDateFilter').value;
+
+                let url = `${API_URL}/api/product-day`;
+                const params = [];
+                if (managerId) params.push(`manager_id=${managerId}`);
+                if (date) params.push(`date=${date}`);
+                if (params.length > 0) url += '?' + params.join('&');
+
+                const res = await fetch(url);
+                const data = await res.json();
+
+                if (data.success) {
+                    allProductDayEntries = data.entries || [];
+                    renderProductDayTable();
+                    updateProductDayStats();
+                }
+            } catch (err) {
+                console.error('Error loading product day data:', err);
+                showToast('Failed to load product day data', 'error');
+            }
+        }
+
+        function renderProductDayTable() {
+            const tbody = document.getElementById('productDayTableBody');
+
+            if (allProductDayEntries.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: var(--color-text-muted);">No product day entries found</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = allProductDayEntries.map(entry => {
+                const manager = allManagers.find(m => m.id === entry.manager_id);
+                const managerName = manager ? manager.full_name : `Manager #${entry.manager_id}`;
+
+                const qtyPct = entry.target_qty > 0 ? Math.round((entry.achieved_qty / entry.target_qty) * 100) : 0;
+                const amtPct = entry.target_amount > 0 ? Math.round((entry.achieved_amount / entry.target_amount) * 100) : 0;
+
+                let statusBadge = 'badge-muted';
+                let statusText = 'Pending';
+                if (qtyPct >= 100 && amtPct >= 100) {
+                    statusBadge = 'badge-success';
+                    statusText = 'Completed';
+                } else if (qtyPct > 0 || amtPct > 0) {
+                    statusBadge = 'badge-warning';
+                    statusText = 'In Progress';
+                }
+
+                return `
+                    <tr>
+                        <td>${entry.id}</td>
+                        <td><strong>${managerName}</strong></td>
+                        <td>${entry.date}</td>
+                        <td>${entry.product_name}</td>
+                        <td>${entry.target_qty || 0}</td>
+                        <td>${entry.achieved_qty || 0} <small style="color: var(--color-text-muted);">(${qtyPct}%)</small></td>
+                        <td>₹${(entry.target_amount || 0).toLocaleString()}</td>
+                        <td>₹${(entry.achieved_amount || 0).toLocaleString()} <small style="color: var(--color-text-muted);">(${amtPct}%)</small></td>
+                        <td><span class="badge ${statusBadge}">${statusText}</span></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function updateProductDayStats() {
+            const totalProducts = allProductDayEntries.length;
+            const totalQtyTarget = allProductDayEntries.reduce((sum, e) => sum + (e.target_qty || 0), 0);
+            const totalQtyAchieved = allProductDayEntries.reduce((sum, e) => sum + (e.achieved_qty || 0), 0);
+            const pct = totalQtyTarget > 0 ? Math.round((totalQtyAchieved / totalQtyTarget) * 100) : 0;
+
+            document.getElementById('statTotalProducts').textContent = totalProducts;
+            document.getElementById('statTotalQtyTarget').textContent = totalQtyTarget;
+            document.getElementById('statTotalQtyAchieved').textContent = totalQtyAchieved;
+            document.getElementById('statAchievementPct').textContent = pct + '%';
+        }
+
+        function populatePdManagerFilter() {
+            const select = document.getElementById('pdManagerFilter');
+            const managers = allManagers.filter(u => u.role === 'Sales Manager');
+
+            select.innerHTML = '<option value="">All Managers</option>' +
+                managers.map(m => `<option value="${m.id}">${m.full_name}</option>`).join('');
+        }
+
+        function clearPdFilters() {
+            document.getElementById('pdManagerFilter').value = '';
+            document.getElementById('pdDateFilter').value = '';
+            loadProductDayData();
+        }
+
+        // Initialize
+        loadManagers();
+        initYearDropdown();
+        setRefreshInterval();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Manager CRM - Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-primary: #0D9488;
+            --color-primary-dark: #0F766E;
+            --color-primary-light: #14B8A6;
+            --color-text-dark: #1F2937;
+            --color-text-muted: #6B7280;
+            --color-border: #E5E7EB;
+            --color-background: #F9FAFB;
+            --color-white: #FFFFFF;
+            --color-error: #DC2626;
+            --color-success: #059669;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #E0F2FE 0%, #CCFBF1 50%, #E0E7FF 100%);
+            padding: 1rem;
+            position: relative;
+        }
+
+        /* Dark mode toggle */
+        .dark-mode-toggle {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--color-white);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-md);
+            font-size: 1.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .dark-mode-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        /* Login Card */
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .login-card {
+            background: var(--color-white);
+            border-radius: var(--radius-xl);
+            padding: 2.5rem;
+            box-shadow: var(--shadow-xl);
+            animation: fadeInUp 0.5s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Header with Logo */
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo-icon {
+            width: 100px;
+            height: 100px;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+        }
+
+        .logo-icon img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+        }
+
+        .login-header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--color-text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .login-header p {
+            color: var(--color-text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+            color: var(--color-text-dark);
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .form-group label a {
+            color: var(--color-primary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.8rem;
+        }
+
+        .form-group label a:hover {
+            text-decoration: underline;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper .icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--color-text-muted);
+            font-size: 1.1rem;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="password"] {
+            width: 100%;
+            padding: 0.875rem 1rem 0.875rem 2.75rem;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            background: var(--color-white);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+        }
+
+        .form-group input::placeholder {
+            color: #9CA3AF;
+        }
+
+        /* Checkbox */
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--color-primary);
+        }
+
+        .checkbox-group label {
+            cursor: pointer;
+            color: var(--color-text-muted);
+            font-size: 0.875rem;
+        }
+
+        /* Button */
+        .btn-primary {
+            width: 100%;
+            padding: 0.875rem;
+            background: var(--color-primary);
+            color: var(--color-white);
+            border: none;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--color-primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* Messages */
+        .message {
+            padding: 0.875rem 1rem;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.error {
+            background-color: #FEE2E2;
+            color: var(--color-error);
+            border-left: 4px solid var(--color-error);
+        }
+
+        .message.success {
+            background-color: #D1FAE5;
+            color: var(--color-success);
+            border-left: 4px solid var(--color-success);
+        }
+
+        /* Footer */
+        .login-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .login-footer p {
+            color: var(--color-text-muted);
+            font-size: 0.875rem;
+        }
+
+        .login-footer a {
+            color: var(--color-primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Test Credentials Box */
+        .test-credentials {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: var(--color-background);
+            border-radius: var(--radius-md);
+            border: 1px dashed var(--color-border);
+        }
+
+        .test-credentials h4 {
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 0.05em;
+            color: var(--color-text-muted);
+            margin-bottom: 0.75rem;
+            text-align: center;
+        }
+
+        .credential-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+        }
+
+        .credential-row:not(:last-child) {
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .credential-label {
+            font-size: 0.85rem;
+            color: var(--color-text-muted);
+        }
+
+        .credential-value {
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+            font-size: 0.8rem;
+            color: var(--color-text-dark);
+            background: var(--color-white);
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--color-border);
+        }
+
+        /* Copyright Footer */
+        .copyright {
+            margin-top: 2rem;
+            text-align: center;
+            color: var(--color-text-muted);
+            font-size: 0.8rem;
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <button class="dark-mode-toggle" title="Toggle Dark Mode">🌙</button>
+
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="logo-icon">
+                    <img src="DCC Logo Back.png" alt="DCC Logo">
+                </div>
+                <h1>Sales Manager CRM</h1>
+                <p>Sign in to your account</p>
+            </div>
+
+            <div id="errorMessage" class="message error"></div>
+            <div id="successMessage" class="message success"></div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <div class="input-wrapper">
+                        <span class="icon">👤</span>
+                        <input type="text" id="username" name="username" required autofocus
+                            placeholder="Enter your username" />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">
+                        Password
+                        <a href="#">Forgot password?</a>
+                    </label>
+                    <div class="input-wrapper">
+                        <span class="icon">🔒</span>
+                        <input type="password" id="password" name="password" required
+                            placeholder="Enter your password" />
+                    </div>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="rememberMe" name="rememberMe" />
+                    <label for="rememberMe">Remember me for 30 days</label>
+                </div>
+
+                <button type="submit" class="btn-primary" id="loginBtn">
+                    Sign In
+                    <span>→</span>
+                </button>
+            </form>
+
+            <div class="login-footer">
+                <p>Need help? <a href="#">Contact your administrator</a></p>
+
+                <div class="test-credentials">
+                    <h4>Test Credentials</h4>
+                    <div class="credential-row">
+                        <span class="credential-label">Admin:</span>
+                        <span class="credential-value">admin / Admin@123</span>
+                    </div>
+                    <div class="credential-row">
+                        <span class="credential-label">Manager:</span>
+                        <span class="credential-value">john_doe / Manager@123</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <p class="copyright">© 2026 Visit Journey CRM Systems. All rights reserved.</p>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3001';
+
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        const loginForm = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.add('show');
+            successMessage.classList.remove('show');
+        }
+
+        function showSuccess(message) {
+            successMessage.textContent = message;
+            successMessage.classList.add('show');
+            errorMessage.classList.remove('show');
+        }
+
+        function hideMessages() {
+            errorMessage.classList.remove('show');
+            successMessage.classList.remove('show');
+        }
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideMessages();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+
+            // Disable button and show loading
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<span class="loading-spinner"></span> Signing in...';
+
+            try {
+                const response = await fetch(`${API_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    // Store user data
+                    const userData = {
+                        user: {
+                            id: data.user_id,
+                            username: data.username,
+                            role: data.role,
+                            full_name: data.full_name
+                        },
+                        token: data.token,
+                        isAuthenticated: true
+                    };
+
+                    if (rememberMe) {
+                        localStorage.setItem('auth-storage', JSON.stringify({ state: userData }));
+                    } else {
+                        sessionStorage.setItem('auth-storage', JSON.stringify({ state: userData }));
+                    }
+
+                    // Show success message
+                    showSuccess(`✅ Welcome, ${data.full_name}! Logged in as ${data.role}`);
+
+                    // Redirect based on role
+                    setTimeout(() => {
+                        if (data.role === 'Admin') {
+                            window.location.href = 'dashboard-admin.html';
+                        } else {
+                            window.location.href = 'dashboard-manager.html';
+                        }
+                    }, 1500);
+
+                } else {
+                    showError(data.message || 'Invalid username or password');
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = 'Sign In <span>→</span>';
+                }
+
+            } catch (error) {
+                console.error('Login error:', error);
+                showError('Failed to connect to server. Make sure the API server is running on port 3001.');
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = 'Sign In <span>→</span>';
+            }
+        });
+
+        // Check if already logged in
+        window.addEventListener('load', () => {
+            const authData = localStorage.getItem('auth-storage') || sessionStorage.getItem('auth-storage');
+            if (authData) {
+                try {
+                    const { state } = JSON.parse(authData);
+                    if (state?.isAuthenticated) {
+                        showSuccess('Already logged in. Redirecting...');
+                        setTimeout(() => {
+                            if (state.user.role === 'Admin') {
+                                window.location.href = 'dashboard-admin.html';
+                            } else {
+                                window.location.href = 'dashboard-manager.html';
+                            }
+                        }, 1000);
+                    }
+                } catch (e) {
+                    console.error('Error parsing auth data:', e);
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1477 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Log - Sales Manager CRM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Export Libraries -->
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="export-utils.js" defer></script>
+    <style>
+        :root {
+            --color-primary: #0D9488;
+            --color-primary-dark: #0F766E;
+            --color-primary-light: #14B8A6;
+            --color-blue: #1E3A8A;
+            --color-text-dark: #1F2937;
+            --color-text-muted: #6B7280;
+            --color-border: #E5E7EB;
+            --color-background: #F9FAFB;
+            --color-white: #FFFFFF;
+            --color-success: #10B981;
+            --color-warning: #F59E0B;
+            --color-error: #DC2626;
+            --color-purple: #7C3AED;
+            --color-orange: #F97316;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--color-background);
+            color: var(--color-text-dark);
+            min-height: 100vh;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: var(--color-white);
+            padding: 0 2rem;
+            height: 64px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--color-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--color-text-dark);
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            /* background: var(--color-primary); */
+            background: transparent;
+            /* border-radius: var(--radius-md); */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .nav-tab {
+            padding: 0.5rem 1rem;
+            text-decoration: none;
+            color: var(--color-text-muted);
+            font-weight: 500;
+            font-size: 0.875rem;
+            border-radius: var(--radius-md);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-tab:hover {
+            color: var(--color-primary);
+            background: rgba(13, 148, 136, 0.05);
+        }
+
+        .nav-tab.active {
+            color: var(--color-primary);
+            background: rgba(13, 148, 136, 0.1);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .user-name {
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        .user-role {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+        }
+
+        .btn-logout {
+            padding: 0.5rem 1rem;
+            background: var(--color-error);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            transition: all 0.2s;
+        }
+
+        .btn-logout:hover {
+            background: #B91C1C;
+        }
+
+        .dark-mode-toggle {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--color-background);
+            border: 1px solid var(--color-border);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem;
+        }
+
+        /* ===== STATUS TOGGLE CARD ===== */
+        .status-card {
+            background: var(--color-white);
+            padding: 1.25rem 1.5rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-card h3 {
+            font-weight: 600;
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .status-card p {
+            color: var(--color-text-muted);
+            font-size: 0.875rem;
+        }
+
+        .toggle-container {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .toggle-btn {
+            padding: 0.625rem 1.25rem;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            background: var(--color-white);
+            color: var(--color-text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .toggle-btn:hover {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+        }
+
+        .toggle-btn.active-office {
+            background: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
+        }
+
+        .toggle-btn.active-field {
+            background: var(--color-white);
+            color: var(--color-text-dark);
+            border-color: var(--color-border);
+        }
+
+        /* ===== STATS GRID ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--color-white);
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+        }
+
+        .stat-card.blue::before {
+            background: var(--color-blue);
+        }
+
+        .stat-card.purple::before {
+            background: var(--color-purple);
+        }
+
+        .stat-card.orange::before {
+            background: var(--color-orange);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+            font-weight: 500;
+        }
+
+        .stat-icon {
+            font-size: 1.25rem;
+            opacity: 0.6;
+        }
+
+        .stat-value {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--color-text-dark);
+            line-height: 1.2;
+        }
+
+        .stat-trend {
+            font-size: 0.8rem;
+            color: var(--color-success);
+            margin-top: 0.25rem;
+        }
+
+        .stat-trend.negative {
+            color: var(--color-error);
+        }
+
+        .stat-subtitle {
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .stat-progress {
+            margin-top: 0.75rem;
+        }
+
+        .progress-bar-container {
+            height: 8px;
+            background: #E5E7EB;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .progress-bar.orange {
+            background: var(--color-orange);
+        }
+
+        .progress-bar.green {
+            background: var(--color-success);
+        }
+
+        .progress-bar.blue {
+            background: var(--color-blue);
+        }
+
+        /* ===== MAIN GRID ===== */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 1024px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ===== CARD STYLES ===== */
+        .card {
+            background: var(--color-white);
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--color-primary);
+        }
+
+        .card-badge {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.75rem;
+            background: rgba(13, 148, 136, 0.1);
+            color: var(--color-primary);
+            border-radius: 999px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        /* ===== FORM STYLES ===== */
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            color: var(--color-text-dark);
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .form-group label .required {
+            color: var(--color-error);
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper .icon {
+            position: absolute;
+            left: 0.875rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--color-text-muted);
+            font-size: 1rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            background: var(--color-white);
+        }
+
+        .form-group input.with-icon {
+            padding-left: 2.5rem;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .location-row {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .location-row input {
+            flex: 1;
+        }
+
+        .btn-location {
+            padding: 0.75rem 1rem;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.875rem;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            transition: all 0.2s;
+        }
+
+        .btn-location:hover {
+            background: var(--color-primary-dark);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 0.875rem;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+            margin-top: 0.5rem;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--color-primary-dark);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .location-status {
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        /* ===== MESSAGES ===== */
+        .message {
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.success {
+            background: #D1FAE5;
+            color: var(--color-success);
+        }
+
+        .message.error {
+            background: #FEE2E2;
+            color: var(--color-error);
+        }
+
+        /* ===== ACTIVITY SECTION ===== */
+        .activity-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.875rem;
+            padding: 0.875rem 0;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+
+        .activity-icon.green {
+            background: #D1FAE5;
+        }
+
+        .activity-icon.blue {
+            background: #DBEAFE;
+        }
+
+        .activity-icon.purple {
+            background: #EDE9FE;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-text {
+            font-size: 0.875rem;
+            color: var(--color-text-dark);
+        }
+
+        .activity-text strong {
+            font-weight: 600;
+        }
+
+        .activity-time {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+        }
+
+        /* ===== MAP CARD ===== */
+        .map-card {
+            margin-top: 1rem;
+        }
+
+        .map-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .map-placeholder {
+            height: 180px;
+            background: #E5E7EB;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-text-muted);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .map-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.5;
+        }
+
+        .map-location-badge {
+            position: absolute;
+            bottom: 1rem;
+            left: 1rem;
+            background: var(--color-white);
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--radius-md);
+            font-size: 0.8rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .map-controls {
+            position: absolute;
+            right: 0.5rem;
+            bottom: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .map-control-btn {
+            width: 28px;
+            height: 28px;
+            background: var(--color-white);
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+        }
+
+        /* ===== VISIT TABLE ===== */
+        .visit-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        .visit-table th {
+            text-align: left;
+            padding: 0.75rem;
+            background: var(--color-background);
+            color: var(--color-text-muted);
+            font-weight: 500;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .visit-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        /* ===== TARGETS SECTION ===== */
+        .target-item {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .target-item:last-child {
+            border-bottom: none;
+        }
+
+        .target-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .target-name {
+            font-weight: 500;
+        }
+
+        .target-percentage {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .target-percentage.low {
+            color: var(--color-error);
+        }
+
+        .target-percentage.medium {
+            color: var(--color-warning);
+        }
+
+        .target-percentage.high {
+            color: var(--color-success);
+        }
+
+        .target-numbers {
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+            margin-top: 0.25rem;
+        }
+
+        /* ===== EXPORT BUTTONS ===== */
+        .export-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-export {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            background: var(--color-white);
+            color: var(--color-text-dark);
+        }
+
+        .btn-export:hover {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--color-text-muted);
+        }
+
+        .empty-state-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--color-text-muted);
+            font-size: 0.8rem;
+            border-top: 1px solid var(--color-border);
+            margin-top: 2rem;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .header {
+                padding: 0 1rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-tabs {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <div class="logo">
+                <div class="logo-icon">
+                    <img src="DCC Logo Back.png" alt="DCC">
+                </div>
+                <span>SalesManager CRM</span>
+            </div>
+            <nav class="nav-tabs">
+                <a href="dashboard-manager.html" class="nav-tab active">📊 Daily Log</a>
+                <a href="journey-map.html" class="nav-tab">🗺️ Journey Map</a>
+                <a href="daily-sales-report.html" class="nav-tab">📈 Reports</a>
+                <a href="product-day.html" class="nav-tab">📦 Product Day</a>
+            </nav>
+        </div>
+        <div class="header-right">
+            <div class="user-info">
+                <div>
+                    <div class="user-name" id="userName">Loading...</div>
+                    <div class="user-role">Sales Representative</div>
+                </div>
+            </div>
+            <button class="btn-logout" onclick="logout()">🚪 Logout</button>
+            <button class="dark-mode-toggle" title="Toggle Dark Mode">🌙</button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Status Toggle Card -->
+        <div class="status-card">
+            <div>
+                <h3>Current Status</h3>
+                <p>Manage your active working mode for real-time tracking.</p>
+            </div>
+            <div class="toggle-container">
+                <button class="toggle-btn active-office" id="btnOffice" onclick="setStatus('In-Office')">
+                    🏢 In-Office
+                </button>
+                <button class="toggle-btn" id="btnField" onclick="setStatus('Field')">
+                    🚗 Field Visit
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card blue">
+                <div class="stat-header">
+                    <span class="stat-label">Visits Today</span>
+                    <span class="stat-icon">📅</span>
+                </div>
+                <div class="stat-value" id="statVisitsToday">0</div>
+                <div class="stat-trend">↑ 12% vs yesterday</div>
+            </div>
+            <div class="stat-card purple">
+                <div class="stat-header">
+                    <span class="stat-label">Weekly Total</span>
+                    <span class="stat-icon">📅</span>
+                </div>
+                <div class="stat-value" id="statVisitsWeek">0</div>
+                <div class="stat-subtitle">Target: 40 visits</div>
+            </div>
+            <div class="stat-card orange">
+                <div class="stat-header">
+                    <span class="stat-label">Target Progress</span>
+                    <span class="stat-icon">📈</span>
+                </div>
+                <div class="stat-value" id="statTargetProgress">0%</div>
+                <div class="stat-progress">
+                    <div class="progress-bar-container">
+                        <div class="progress-bar orange" id="targetProgressBar" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="main-grid">
+            <!-- Left Column: Log New Visit -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <span>⚡</span> Log New Visit
+                    </div>
+                    <span class="card-badge">Live Entry</span>
+                </div>
+
+                <div id="visitSuccessMessage" class="message success"></div>
+                <div id="visitErrorMessage" class="message error"></div>
+
+                <form id="visitForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Client Name <span class="required">*</span></label>
+                            <input type="text" id="clientName" required placeholder="Enter client name">
+                        </div>
+                        <div class="form-group">
+                            <label>Client Type <span class="required">*</span></label>
+                            <select id="clientType" required>
+                                <option value="">Select type</option>
+                                <option value="Dealer">Dealer</option>
+                                <option value="Retailer">Retailer</option>
+                                <option value="Distributor">Distributor</option>
+                                <option value="End Customer">End Customer</option>
+                                <option value="Corporate">Corporate</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Location <span class="required">*</span></label>
+                        <div class="location-row">
+                            <div class="input-wrapper" style="flex: 1;">
+                                <span class="icon">📍</span>
+                                <input type="text" id="location" class="with-icon" required
+                                    placeholder="Enter location">
+                            </div>
+                            <button type="button" class="btn-location" onclick="getCurrentLocation()">
+                                📍 Get Location
+                            </button>
+                        </div>
+                        <input type="hidden" id="latitude">
+                        <input type="hidden" id="longitude">
+                        <div class="location-status" id="locationStatus"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Visit Type <span class="required">*</span></label>
+                        <select id="visitType" required>
+                            <option value="">Select visit type</option>
+                            <option value="Sales Visit">Sales Visit</option>
+                            <option value="Collection">Collection</option>
+                            <option value="Demo">Demo</option>
+                            <option value="Follow-up">Follow-up</option>
+                            <option value="New Prospect">New Prospect</option>
+                            <option value="Complaint">Complaint Resolution</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Notes</label>
+                        <textarea id="notes" placeholder="Add visit notes..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-primary" id="btnSubmitVisit">
+                        ✅ Log Visit Record
+                    </button>
+                </form>
+            </div>
+
+            <!-- Right Column: Activity & Map -->
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <!-- Recent Activity -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Recent Activity</div>
+                    </div>
+                    <div id="activityContainer">
+                        <div class="activity-item">
+                            <div class="activity-icon green">✓</div>
+                            <div class="activity-content">
+                                <div class="activity-text">Visited <strong>Global Tech Solutions</strong></div>
+                                <div class="activity-time">12m ago</div>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon blue">✏️</div>
+                            <div class="activity-content">
+                                <div class="activity-text">Updated report for <strong>Apex Retail</strong></div>
+                                <div class="activity-time">2h ago</div>
+                            </div>
+                        </div>
+                        <div class="activity-item">
+                            <div class="activity-icon purple">P</div>
+                            <div class="activity-content">
+                                <div class="activity-text">Started day at <strong>Corporate HQ</strong></div>
+                                <div class="activity-time">8h ago</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Map View -->
+                <div class="card map-card">
+                    <div class="map-header">
+                        <div class="card-title">Live Map View</div>
+                        <a href="journey-map.html"
+                            style="color: var(--color-primary); font-size: 0.875rem; text-decoration: none;">Full
+                            Map</a>
+                    </div>
+                    <div class="map-placeholder">
+                        <span>🗺️ Map Preview</span>
+                        <div class="map-location-badge">
+                            <span style="color: var(--color-primary);">●</span> Current Location: Mumbai
+                        </div>
+                        <div class="map-controls">
+                            <button class="map-control-btn">+</button>
+                            <button class="map-control-btn">−</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Visits Section -->
+        <div class="card" style="margin-top: 1.5rem;">
+            <div class="card-header">
+                <div class="card-title">📋 Recent Visits</div>
+                <div class="export-buttons">
+                    <button class="btn-export" onclick="exportVisitsExcel()">📊 EXCEL</button>
+                    <button class="btn-export" onclick="exportVisitsPDF()">📄 PDF</button>
+                </div>
+            </div>
+            <div id="visitsContainer">
+                <div class="empty-state">
+                    <div class="empty-state-icon">📋</div>
+                    <p>No visits logged yet. Start logging your visits!</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Targets Section -->
+        <div class="card" style="margin-top: 1.5rem;">
+            <div class="card-header">
+                <div class="card-title">🎯 Today's Targets</div>
+                <div class="export-buttons">
+                    <button class="btn-export" onclick="exportTargetsExcel()">📊 EXCEL</button>
+                    <button class="btn-export" onclick="exportTargetsPDF()">📄 PDF</button>
+                </div>
+            </div>
+            <div id="targetsContainer">
+                <div class="empty-state">
+                    <div class="empty-state-icon">🎯</div>
+                    <p>No targets assigned for today</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        © 2026 SalesManager CRM. All rights reserved. Registered for corporate use by <span
+            id="footerUser">john_doe</span>.
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3001';
+        let currentUser = null;
+
+        // Authentication Check
+        window.addEventListener('load', () => {
+            const authData = localStorage.getItem('auth-storage') || sessionStorage.getItem('auth-storage');
+            if (!authData) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                const { state } = JSON.parse(authData);
+                if (!state?.isAuthenticated) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                currentUser = state.user;
+                document.getElementById('userName').textContent = currentUser.full_name || currentUser.username;
+                document.getElementById('footerUser').textContent = currentUser.username;
+
+                // Load data
+                loadCurrentStatus();
+                loadVisits();
+                loadTargets();
+            } catch (e) {
+                console.error('Auth error:', e);
+                window.location.href = 'login.html';
+            }
+        });
+
+        // Status Toggle
+        async function loadCurrentStatus() {
+            try {
+                const response = await fetch(`${API_URL}/api/status/current/${currentUser.id}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    updateStatusUI(data.status);
+                }
+            } catch (error) {
+                console.error('Error loading status:', error);
+                updateStatusUI('In-Office');
+            }
+        }
+
+        async function setStatus(status) {
+            try {
+                const response = await fetch(`${API_URL}/api/status/update`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        manager_id: currentUser.id,
+                        status: status
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    updateStatusUI(status);
+                }
+            } catch (error) {
+                console.error('Error updating status:', error);
+            }
+        }
+
+        function updateStatusUI(status) {
+            const btnOffice = document.getElementById('btnOffice');
+            const btnField = document.getElementById('btnField');
+
+            btnOffice.classList.remove('active-office');
+            btnField.classList.remove('active-field');
+
+            if (status === 'In-Office') {
+                btnOffice.classList.add('active-office');
+            } else {
+                btnField.classList.add('active-field');
+            }
+        }
+
+        // Load Targets
+        async function loadTargets() {
+            try {
+                const response = await fetch(`${API_URL}/api/targets/${currentUser.id}`);
+                const data = await response.json();
+
+                if (data.success && data.targets.length > 0) {
+                    displayTargets(data.targets);
+                } else {
+                    document.getElementById('targetsContainer').innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🎯</div>
+                            <p>No targets assigned for today</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading targets:', error);
+            }
+        }
+
+        function displayTargets(targets) {
+            let totalTarget = 0;
+            let totalAchieved = 0;
+
+            const html = targets.map(target => {
+                const percentage = Math.round((target.achieved / target.target_quantity) * 100);
+                const level = percentage < 50 ? 'low' : percentage < 80 ? 'medium' : 'high';
+                const barColor = percentage < 50 ? 'background: #EF4444' : percentage < 80 ? 'background: #F59E0B' : 'background: #10B981';
+
+                totalTarget += target.target_quantity;
+                totalAchieved += target.achieved;
+
+                return `
+                    <div class="target-item">
+                        <div class="target-header">
+                            <span class="target-name">${target.product}</span>
+                            <span class="target-percentage ${level}">${percentage}%</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" style="width: ${Math.min(percentage, 100)}%; ${barColor}"></div>
+                        </div>
+                        <div class="target-numbers">${target.achieved} / ${target.target_quantity} units</div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('targetsContainer').innerHTML = html;
+
+            // Update stats
+            const overallPercentage = Math.round((totalAchieved / totalTarget) * 100);
+            document.getElementById('statTargetProgress').textContent = overallPercentage + '%';
+            document.getElementById('targetProgressBar').style.width = Math.min(overallPercentage, 100) + '%';
+        }
+
+        // Load Visits
+        async function loadVisits() {
+            try {
+                const response = await fetch(`${API_URL}/api/visits/${currentUser.id}`);
+                const data = await response.json();
+
+                if (data.success && data.visits.length > 0) {
+                    displayVisits(data.visits);
+                    updateVisitStats(data.visits);
+                    updateActivityFeed(data.visits);
+                } else {
+                    document.getElementById('visitsContainer').innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📋</div>
+                            <p>No visits logged yet. Start logging your visits!</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading visits:', error);
+            }
+        }
+
+        function displayVisits(visits) {
+            const sortedVisits = visits.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            const recentVisits = sortedVisits.slice(0, 10);
+
+            const html = `
+                <table class="visit-table">
+                    <thead>
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>Client</th>
+                            <th>Type</th>
+                            <th>Location</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${recentVisits.map(visit => `
+                            <tr>
+                                <td>${new Date(visit.created_at).toLocaleString()}</td>
+                                <td><strong>${visit.client_name}</strong><br><small style="color: #6B7280">${visit.client_type}</small></td>
+                                <td>${visit.visit_type}</td>
+                                <td>${visit.location}</td>
+                                <td>${visit.notes || '-'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            document.getElementById('visitsContainer').innerHTML = html;
+        }
+
+        function updateActivityFeed(visits) {
+            const sortedVisits = visits.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 3);
+
+            if (sortedVisits.length === 0) return;
+
+            const html = sortedVisits.map((visit, index) => {
+                const icons = ['green', 'blue', 'purple'];
+                const symbols = ['✓', '✏️', 'P'];
+                const time = getTimeAgo(new Date(visit.created_at));
+
+                return `
+                    <div class="activity-item">
+                        <div class="activity-icon ${icons[index % 3]}">${symbols[index % 3]}</div>
+                        <div class="activity-content">
+                            <div class="activity-text">Visited <strong>${visit.client_name}</strong></div>
+                            <div class="activity-time">${time}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('activityContainer').innerHTML = html;
+        }
+
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diff = Math.floor((now - date) / 1000);
+
+            if (diff < 60) return 'Just now';
+            if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+            if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+            return Math.floor(diff / 86400) + 'd ago';
+        }
+
+        function updateVisitStats(visits) {
+            const today = new Date().toISOString().split('T')[0];
+            const visitsToday = visits.filter(v => v.created_at.startsWith(today)).length;
+
+            const weekAgo = new Date();
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            const visitsWeek = visits.filter(v => new Date(v.created_at) >= weekAgo).length;
+
+            document.getElementById('statVisitsToday').textContent = visitsToday;
+            document.getElementById('statVisitsWeek').textContent = visitsWeek;
+        }
+
+        // Geolocation Capture
+        function getCurrentLocation() {
+            const statusEl = document.getElementById('locationStatus');
+            statusEl.style.display = 'block';
+            statusEl.textContent = '📍 Getting location...';
+            statusEl.style.color = '#0D9488';
+
+            if ('geolocation' in navigator) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+
+                        document.getElementById('latitude').value = lat;
+                        document.getElementById('longitude').value = lng;
+
+                        statusEl.textContent = `✅ Location captured: ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+                        statusEl.style.color = '#059669';
+
+                        // Try to get address
+                        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+                            .then(res => res.json())
+                            .then(data => {
+                                if (data.display_name) {
+                                    document.getElementById('location').value = data.display_name;
+                                }
+                            });
+                    },
+                    (error) => {
+                        statusEl.textContent = '❌ Unable to get location. Please enter manually.';
+                        statusEl.style.color = '#DC2626';
+                    }
+                );
+            } else {
+                statusEl.textContent = '❌ Geolocation not supported';
+                statusEl.style.color = '#DC2626';
+            }
+        }
+
+        // Visit Form Submission
+        document.getElementById('visitForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const visitData = {
+                manager_id: currentUser.id,
+                client_name: document.getElementById('clientName').value,
+                client_type: document.getElementById('clientType').value,
+                location: document.getElementById('location').value,
+                latitude: document.getElementById('latitude').value ? parseFloat(document.getElementById('latitude').value) : null,
+                longitude: document.getElementById('longitude').value ? parseFloat(document.getElementById('longitude').value) : null,
+                visit_type: document.getElementById('visitType').value,
+                notes: document.getElementById('notes').value,
+                visit_date: new Date().toISOString().split('T')[0]
+            };
+
+            const btnSubmit = document.getElementById('btnSubmitVisit');
+            btnSubmit.disabled = true;
+            btnSubmit.textContent = 'Logging...';
+
+            try {
+                const response = await fetch(`${API_URL}/api/visits`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(visitData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const successMsg = document.getElementById('visitSuccessMessage');
+                    successMsg.textContent = '✅ Visit logged successfully!';
+                    successMsg.classList.add('show');
+
+                    document.getElementById('visitForm').reset();
+                    loadVisits();
+
+                    setTimeout(() => {
+                        successMsg.classList.remove('show');
+                    }, 3000);
+                } else {
+                    throw new Error('Failed to log visit');
+                }
+            } catch (error) {
+                const errorMsg = document.getElementById('visitErrorMessage');
+                errorMsg.textContent = '❌ Error logging visit. Please try again.';
+                errorMsg.classList.add('show');
+
+                setTimeout(() => {
+                    errorMsg.classList.remove('show');
+                }, 3000);
+            } finally {
+                btnSubmit.disabled = false;
+                btnSubmit.textContent = '✅ Log Visit Record';
+            }
+        });
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('auth-storage');
+                sessionStorage.removeItem('auth-storage');
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.href = 'login.html';
+            }
+        }
+
+        // ===== EXPORT FUNCTIONS =====
+        let allVisitsData = [];
+        let allTargetsData = [];
+
+        const originalLoadVisits = loadVisits;
+        loadVisits = async function () {
+            await originalLoadVisits();
+            try {
+                const response = await fetch(`${API_URL}/api/visits/${currentUser.id}`);
+                const data = await response.json();
+                if (data.success) {
+                    allVisitsData = data.visits;
+                }
+            } catch (error) {
+                console.error('Error loading visits for export:', error);
+            }
+        };
+
+        const originalLoadTargets = loadTargets;
+        loadTargets = async function () {
+            await originalLoadTargets();
+            try {
+                const response = await fetch(`${API_URL}/api/targets/${currentUser.id}`);
+                const data = await response.json();
+                if (data.success) {
+                    allTargetsData = data.targets;
+                }
+            } catch (error) {
+                console.error('Error loading targets for export:', error);
+            }
+        };
+
+        function exportVisitsExcel() {
+            if (!allVisitsData || allVisitsData.length === 0) {
+                alert('No visits data to export');
+                return;
+            }
+            const filename = `visits_${currentUser.username}_${new Date().toISOString().split('T')[0]}.xlsx`;
+            window.exportManager.exportVisitsToExcel(allVisitsData, filename);
+        }
+
+        function exportVisitsPDF() {
+            if (!allVisitsData || allVisitsData.length === 0) {
+                alert('No visits data to export');
+                return;
+            }
+            const filename = `visits_${currentUser.username}_${new Date().toISOString().split('T')[0]}.pdf`;
+            window.exportManager.exportVisitsToPDF(allVisitsData, currentUser.username, filename);
+        }
+
+        function exportTargetsExcel() {
+            if (!allTargetsData || allTargetsData.length === 0) {
+                alert('No targets data to export');
+                return;
+            }
+            const filename = `targets_${currentUser.username}_${new Date().toISOString().split('T')[0]}.xlsx`;
+            window.exportManager.exportTargetsToExcel(allTargetsData, filename);
+        }
+
+        function exportTargetsPDF() {
+            if (!allTargetsData || allTargetsData.length === 0) {
+                alert('No targets data to export');
+                return;
+            }
+            const filename = `targets_${currentUser.username}_${new Date().toISOString().split('T')[0]}.pdf`;
+            window.exportManager.exportTargetsToPDF(allTargetsData, currentUser.username, filename);
+        }
+    </script>
+</body>
+
+</html>
