@@ -25,11 +25,14 @@ const Login = () => {
     }
 
     // Demo users for hosted/offline mode (no backend required)
-    const DEMO_USERS = {
-        admin: { id: 1, username: 'admin', role: 'Admin', full_name: 'Admin User', password: 'admin123' },
-        manager: { id: 2, username: 'manager', role: 'Sales Manager', full_name: 'Sales Manager', password: 'manager123' },
-        akki: { id: 3, username: 'akki', role: 'Sales Manager', full_name: 'Akki Bansode', password: 'akki123' },
-    }
+    const DEMO_USERS = [
+        { id: 1, username: 'admin', role: 'Admin', full_name: 'Admin User', password: 'Admin@123' },
+        { id: 2, username: 'john_doe', role: 'Sales Manager', full_name: 'John Doe', password: 'Manager@123' },
+        { id: 3, username: 'admin', role: 'Admin', full_name: 'Admin User', password: 'admin123' },
+        { id: 4, username: 'manager', role: 'Sales Manager', full_name: 'Sales Manager', password: 'manager123' },
+        { id: 5, username: 'akki', role: 'Sales Manager', full_name: 'Akki Bansode', password: 'akki123' },
+    ]
+
 
     const handleSubmit = async (e) => {
         e.preventDefault()
